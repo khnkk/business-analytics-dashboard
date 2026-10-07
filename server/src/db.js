@@ -14,13 +14,25 @@ const serverRoot = path.resolve(currentDir, '..');
 
 const configured = process.env.DB_FILE || './data/business_analytics.db';
 
-const dbPath = path.isAbsolute(configured)
+const originalDbPath = path.isAbsolute(configured)
   ? configured
   : path.resolve(serverRoot, configured);
 
 const isVercel = Boolean(process.env.VERCEL);
 
-if (!isVercel) {
+let dbPath = originalDbPath;
+
+if (isVercel) {
+  const tempDbPath = '/tmp/business_analytics.db';
+
+  if (!fs.existsSync(originalDbPath)) {
+    throw new Error(`Database file not found: ${originalDbPath}`);
+  }
+
+  fs.copyFileSync(originalDbPath, tempDbPath);
+
+  dbPath = tempDbPath;
+} else {
   fs.mkdirSync(path.dirname(dbPath), { recursive: true });
 }
 
