@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: business-analytics-dashboard
+    env: node
+    buildCommand: npm install && npm run install:all && npm run import-data && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    disk:
+      name: analytics-data
+      mountPath: /opt/render/project/src/server/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_FILE
+        value: /opt/render/project/src/server/data/business_analytics.db
+      - key: CLIENT_ORIGIN
+        value: '*'
